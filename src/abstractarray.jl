@@ -287,6 +287,21 @@ end
     end
 end
 
+# Implement hvcat in terms of vcat and hcat
+@inline function hvcat(rows::Tuple{Vararg{Int}}, xs::StaticVecOrMatLike...)
+    ind = 1
+    vcat(
+        # Assemble rows first
+        (   (
+                B = xs[ind:ind+L-1];
+                ind += L;
+                hcat(B...)
+            )
+            for L in rows
+        )...
+    )
+end
+
 if VERSION >= v"1.6.0-DEV.1334"
     # FIXME: This always assumes one-based linear indexing and that subtypes of StaticArray
     # don't overload iterate
